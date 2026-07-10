@@ -19,5 +19,5 @@ env/
 .DS_Store
 .DS_Store?
 ehthumbs.db
-Icon?
+Icon[^s]
 Thumbs.db
