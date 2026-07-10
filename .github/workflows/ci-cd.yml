@@ -10,6 +10,8 @@ jobs:
   test:
     name: Run Odoo Tests
     runs-on: ubuntu-latest
+    env:
+      UV_PYTHON_DOWNLOADS: never
 
     services:
       postgres:
