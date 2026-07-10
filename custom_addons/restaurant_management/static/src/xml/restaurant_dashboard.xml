@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="restaurant_management.RestaurantDashboard">
+        <div class="o_restaurant_dashboard" style="
+            background: linear-gradient(160deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 28px 32px;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: #e0e0f0;
+        ">
+
+            <!-- ======= HEADER ======= -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <h1 style="font-size:1.7rem; font-weight:800; color:#fff; margin:0 0 4px; letter-spacing:-0.5px;">
+                        🍽️ Restaurant Dashboard
+                    </h1>
+                    <p style="color:rgba(255,255,255,0.45); margin:0; font-size:0.9rem;">
+                        Real-time overview of today's operations
+                        <t t-if="state.lastUpdated">
+                            · Last updated <strong style="color:#e2b04a;"><t t-out="state.lastUpdated"/></strong>
+                        </t>
+                    </p>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <!-- Loading spinner badge -->
+                    <t t-if="state.loading">
+                        <span style="
+                            background:rgba(226,176,74,0.15);
+                            border:1px solid rgba(226,176,74,0.3);
+                            color:#e2b04a;
+                            border-radius:20px;
+                            padding:6px 14px;
+                            font-size:0.8rem;
+                            font-weight:600;
+                        ">⟳ Refreshing...</span>
+                    </t>
+                    <button t-on-click="loadStats" style="
+                        background: linear-gradient(135deg,#e2b04a,#c97d20);
+                        color:#0f0f1a;
+                        border:none;
+                        border-radius:10px;
+                        padding:9px 20px;
+                        font-weight:700;
+                        font-size:0.9rem;
+                        cursor:pointer;
+                        transition:opacity 0.2s;
+                    ">↻ Refresh</button>
+                </div>
+            </div>
+
+            <!-- ======= ERROR BANNER ======= -->
+            <t t-if="state.error">
+                <div style="
+                    background:rgba(239,68,68,0.12);
+                    border:1px solid rgba(239,68,68,0.3);
+                    color:#fca5a5;
+                    border-radius:12px;
+                    padding:14px 20px;
+                    margin-bottom:24px;
+                    font-size:0.9rem;
+                ">⚠️ <t t-out="state.error"/></div>
+            </t>
+
+            <!-- ======= STAT CARDS ======= -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:28px;">
+
+                <!-- Today's Bookings -->
+                <div style="
+                    background:linear-gradient(135deg,#3a7bd5,#3a6073);
+                    border-radius:16px;
+                    padding:22px 20px;
+                    position:relative;
+                    overflow:hidden;
+                ">
+                    <div style="position:absolute;top:-12px;right:-12px;font-size:5rem;opacity:0.1;">📅</div>
+                    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.65);margin-bottom:8px;">Today's Bookings</div>
+                    <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;">
+                        <t t-if="state.loading">—</t>
+                        <t t-else=""><t t-out="state.stats.total_today"/></t>
+                    </div>
+                </div>
+
+                <!-- Confirmed -->
+                <div style="
+                    background:linear-gradient(135deg,#11998e,#38ef7d);
+                    border-radius:16px;
+                    padding:22px 20px;
+                    position:relative;
+                    overflow:hidden;
+                ">
+                    <div style="position:absolute;top:-12px;right:-12px;font-size:5rem;opacity:0.1;">✅</div>
+                    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.65);margin-bottom:8px;">Confirmed</div>
+                    <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;">
+                        <t t-if="state.loading">—</t>
+                        <t t-else=""><t t-out="state.stats.confirmed_today"/></t>
+                    </div>
+                </div>
+
+                <!-- Arrived -->
+                <div style="
+                    background:linear-gradient(135deg,#f7971e,#ffd200);
+                    border-radius:16px;
+                    padding:22px 20px;
+                    position:relative;
+                    overflow:hidden;
+                ">
+                    <div style="position:absolute;top:-12px;right:-12px;font-size:5rem;opacity:0.1;">🚶</div>
+                    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(0,0,0,0.45);margin-bottom:8px;">Arrived</div>
+                    <div style="font-size:2.4rem;font-weight:800;color:#0f0f1a;line-height:1;">
+                        <t t-if="state.loading">—</t>
+                        <t t-else=""><t t-out="state.stats.arrived_today"/></t>
+                    </div>
+                </div>
+
+                <!-- Active Kitchen Orders -->
+                <div style="
+                    background:linear-gradient(135deg,#f12711,#f5af19);
+                    border-radius:16px;
+                    padding:22px 20px;
+                    position:relative;
+                    overflow:hidden;
+                    cursor:pointer;
+                " t-on-click="openKitchenQueue">
+                    <div style="position:absolute;top:-12px;right:-12px;font-size:5rem;opacity:0.1;">🔥</div>
+                    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.65);margin-bottom:8px;">Kitchen Orders</div>
+                    <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;">
+                        <t t-if="state.loading">—</t>
+                        <t t-else=""><t t-out="state.stats.active_kitchen_orders"/></t>
+                    </div>
+                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.6);margin-top:4px;">Click to open KDS →</div>
+                </div>
+
+                <!-- Today's Sales -->
+                <div style="
+                    background:linear-gradient(135deg,#7F00FF,#E100FF);
+                    border-radius:16px;
+                    padding:22px 20px;
+                    position:relative;
+                    overflow:hidden;
+                ">
+                    <div style="position:absolute;top:-12px;right:-12px;font-size:5rem;opacity:0.1;">💰</div>
+                    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.65);margin-bottom:8px;">Today's Revenue</div>
+                    <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1;">
+                        <t t-if="state.loading">—</t>
+                        <t t-else="">LKR <t t-out="formatCurrency(state.stats.total_sales)"/></t>
+                    </div>
+                </div>
+
+                <!-- Reservable Tables -->
+                <div style="
+                    background:linear-gradient(135deg,#1c1c2e,#2d2d4e);
+                    border:1px solid rgba(226,176,74,0.2);
+                    border-radius:16px;
+                    padding:22px 20px;
+                    position:relative;
+                    overflow:hidden;
+                ">
+                    <div style="position:absolute;top:-12px;right:-12px;font-size:5rem;opacity:0.07;">🪑</div>
+                    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.45);margin-bottom:8px;">Reservable Tables</div>
+                    <div style="font-size:2.4rem;font-weight:800;color:#e2b04a;line-height:1;">
+                        <t t-if="state.loading">—</t>
+                        <t t-else=""><t t-out="state.stats.reservable_tables"/></t>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ======= BOTTOM ROW ======= -->
+            <div style="display:grid; grid-template-columns:1fr 340px; gap:20px; align-items:start;">
+
+                <!-- Recent Reservations Table -->
+                <div style="
+                    background:rgba(255,255,255,0.04);
+                    border:1px solid rgba(255,255,255,0.07);
+                    border-radius:16px;
+                    overflow:hidden;
+                ">
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        padding:18px 22px;
+                        border-bottom:1px solid rgba(255,255,255,0.07);
+                    ">
+                        <h5 style="margin:0;font-weight:700;color:#fff;font-size:1rem;">Recent Reservations</h5>
+                        <button t-on-click="openReservations" style="
+                            background:rgba(226,176,74,0.1);
+                            border:1px solid rgba(226,176,74,0.25);
+                            color:#e2b04a;
+                            border-radius:8px;
+                            padding:5px 14px;
+                            font-size:0.8rem;
+                            font-weight:600;
+                            cursor:pointer;
+                        ">View All →</button>
+                    </div>
+
+                    <!-- Loading skeleton -->
+                    <t t-if="state.loading">
+                        <div style="padding:32px; text-align:center; color:rgba(255,255,255,0.3); font-size:0.9rem;">
+                            Loading reservations...
+                        </div>
+                    </t>
+
+                    <!-- Table -->
+                    <t t-else="">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr style="background:rgba(255,255,255,0.03);">
+                                    <th style="padding:10px 22px; text-align:left; font-size:0.72rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Ref</th>
+                                    <th style="padding:10px 12px; text-align:left; font-size:0.72rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Customer</th>
+                                    <th style="padding:10px 12px; text-align:left; font-size:0.72rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Table</th>
+                                    <th style="padding:10px 12px; text-align:left; font-size:0.72rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Date</th>
+                                    <th style="padding:10px 12px; text-align:right; font-size:0.72rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Guests</th>
+                                    <th style="padding:10px 22px; text-align:right; font-size:0.72rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="state.stats.recent_reservations and state.stats.recent_reservations.length > 0">
+                                    <t t-foreach="state.stats.recent_reservations" t-as="res" t-key="res.name">
+                                        <tr style="border-top:1px solid rgba(255,255,255,0.04); transition:background 0.15s;">
+                                            <td style="padding:13px 22px; font-weight:700; color:#e2b04a; font-size:0.85rem;"><t t-out="res.name"/></td>
+                                            <td style="padding:13px 12px; color:#c0c0d0; font-size:0.88rem;"><t t-out="res.customer"/></td>
+                                            <td style="padding:13px 12px; color:#a0a0c0; font-size:0.85rem;"><t t-out="res.table"/></td>
+                                            <td style="padding:13px 12px; color:#a0a0c0; font-size:0.85rem;"><t t-out="res.date"/></td>
+                                            <td style="padding:13px 12px; color:#c0c0d0; font-size:0.88rem; text-align:right;"><t t-out="res.guests"/></td>
+                                            <td style="padding:13px 22px; text-align:right;">
+                                                <span t-att-class="getStateBadgeClass(res.state)" style="font-size:0.72rem; padding:3px 10px; border-radius:20px;">
+                                                    <t t-out="getStateLabel(res.state)"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <tr>
+                                        <td colspan="6" style="padding:40px; text-align:center; color:rgba(255,255,255,0.25); font-size:0.9rem;">
+                                            No reservations today
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+
+                <!-- Operations Summary sidebar -->
+                <div style="
+                    background:rgba(255,255,255,0.04);
+                    border:1px solid rgba(255,255,255,0.07);
+                    border-radius:16px;
+                    overflow:hidden;
+                ">
+                    <div style="padding:18px 22px; border-bottom:1px solid rgba(255,255,255,0.07);">
+                        <h5 style="margin:0;font-weight:700;color:#fff;font-size:1rem;">Operations Summary</h5>
+                    </div>
+                    <div style="padding:20px;">
+
+                        <!-- Row: Confirmed -->
+                        <div style="display:flex; align-items:center; margin-bottom:18px;">
+                            <div style="
+                                width:44px; height:44px;
+                                background:rgba(59,130,246,0.15);
+                                border-radius:10px;
+                                display:flex; align-items:center; justify-content:center;
+                                font-size:1.2rem;
+                                margin-right:14px;
+                                flex-shrink:0;
+                            ">✅</div>
+                            <div>
+                                <div style="font-weight:700;color:#fff;font-size:0.9rem;">Confirmed</div>
+                                <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;">
+                                    <t t-if="state.loading">—</t>
+                                    <t t-else=""><t t-out="state.stats.confirmed_today"/> reservations awaiting arrival</t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row: Arrived -->
+                        <div style="display:flex; align-items:center; margin-bottom:18px;">
+                            <div style="
+                                width:44px; height:44px;
+                                background:rgba(251,191,36,0.15);
+                                border-radius:10px;
+                                display:flex; align-items:center; justify-content:center;
+                                font-size:1.2rem;
+                                margin-right:14px;
+                                flex-shrink:0;
+                            ">🚶</div>
+                            <div>
+                                <div style="font-weight:700;color:#fff;font-size:0.9rem;">Arrived</div>
+                                <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;">
+                                    <t t-if="state.loading">—</t>
+                                    <t t-else=""><t t-out="state.stats.arrived_today"/> tables currently occupied</t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row: Done -->
+                        <div style="display:flex; align-items:center; margin-bottom:18px;">
+                            <div style="
+                                width:44px; height:44px;
+                                background:rgba(34,197,94,0.15);
+                                border-radius:10px;
+                                display:flex; align-items:center; justify-content:center;
+                                font-size:1.2rem;
+                                margin-right:14px;
+                                flex-shrink:0;
+                            ">🎉</div>
+                            <div>
+                                <div style="font-weight:700;color:#fff;font-size:0.9rem;">Done</div>
+                                <div style="color:rgba(255,255,255,0.4);font-size:0.8rem;">
+                                    <t t-if="state.loading">—</t>
+                                    <t t-else=""><t t-out="state.stats.done_today"/> bookings completed</t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div style="border-top:1px solid rgba(255,255,255,0.06); margin:16px 0;"/>
+
+                        <!-- Quick actions -->
+                        <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Quick Actions</div>
+                        <button t-on-click="openReservations" style="
+                            width:100%; margin-bottom:8px;
+                            background:rgba(226,176,74,0.1);
+                            border:1px solid rgba(226,176,74,0.2);
+                            color:#e2b04a;
+                            border-radius:10px;
+                            padding:10px;
+                            font-weight:600;
+                            font-size:0.85rem;
+                            cursor:pointer;
+                            text-align:left;
+                        ">📋 Manage Reservations</button>
+                        <button t-on-click="openKitchenQueue" style="
+                            width:100%;
+                            background:rgba(239,68,68,0.08);
+                            border:1px solid rgba(239,68,68,0.2);
+                            color:#fca5a5;
+                            border-radius:10px;
+                            padding:10px;
+                            font-weight:600;
+                            font-size:0.85rem;
+                            cursor:pointer;
+                            text-align:left;
+                        ">🔥 Kitchen Display</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </t>
+</templates>

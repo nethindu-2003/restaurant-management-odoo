@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree/List View -->
+    <record id="view_restaurant_reservation_tree" model="ir.ui.view">
+        <field name="name">restaurant.reservation.list</field>
+        <field name="model">restaurant.reservation</field>
+        <field name="arch" type="xml">
+            <list string="Reservations" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'" decoration-warning="state == 'arrived'" decoration-muted="state in ('done', 'cancelled')">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="table_id"/>
+                <field name="reservation_date"/>
+                <field name="start_time" widget="float_time"/>
+                <field name="end_time" widget="float_time"/>
+                <field name="guest_count"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'" decoration-warning="state == 'arrived'" decoration-primary="state == 'done'" decoration-danger="state == 'cancelled'"/>
+                <button name="action_arrive" string="Mark Arrived" type="object" class="btn btn-sm btn-success" invisible="state != 'confirmed'"/>
+                <button name="action_done" string="Done" type="object" class="btn btn-sm btn-primary" invisible="state != 'arrived'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_restaurant_reservation_form" model="ir.ui.view">
+        <field name="name">restaurant.reservation.form</field>
+        <field name="model">restaurant.reservation</field>
+        <field name="arch" type="xml">
+            <form string="Reservation">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_arrive" string="Mark Arrived" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_done" string="Done" type="object" class="oe_highlight" invisible="state != 'arrived'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_draft" string="Reset to Draft" type="object" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,arrived,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Customer Details">
+                            <field name="customer_id"/>
+                            <field name="guest_count"/>
+                        </group>
+                        <group string="Reservation Details">
+                            <field name="table_id"/>
+                            <field name="reservation_date"/>
+                            <label for="start_time" string="Time Window"/>
+                            <div class="o_row">
+                                <field name="start_time" widget="float_time" class="oe_inline"/>
+                                <span> to </span>
+                                <field name="end_time" widget="float_time" class="oe_inline"/>
+                            </div>
+                            <field name="pos_order_id" invisible="not pos_order_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Add custom request notes here..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_restaurant_reservation_kanban" model="ir.ui.view">
+        <field name="name">restaurant.reservation.kanban</field>
+        <field name="model">restaurant.reservation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" quick_create="false">
+                <field name="id"/>
+                <field name="customer_id"/>
+                <field name="table_id"/>
+                <field name="reservation_date"/>
+                <field name="start_time"/>
+                <field name="guest_count"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="m-0"><field name="name"/></h5>
+                                <span class="badge text-bg-secondary"><field name="guest_count"/> Guests</span>
+                            </div>
+                            <div class="mb-1 text-muted">
+                                <i class="fa fa-user me-1"/> <field name="customer_id"/>
+                            </div>
+                            <div class="mb-1 text-muted">
+                                <i class="fa fa-table me-1"/> Table: <field name="table_id"/>
+                            </div>
+                            <div class="mb-1 text-muted">
+                                <i class="fa fa-calendar me-1"/> <field name="reservation_date"/> @ <field name="start_time" widget="float_time"/>
+                            </div>
+                            <div class="mt-2 pt-2 border-top d-flex justify-content-end gap-1" t-if="record.state.raw_value === 'confirmed' || record.state.raw_value === 'arrived'">
+                                <button name="action_arrive" type="object" class="btn btn-sm btn-success" invisible="state != 'confirmed'">
+                                    Mark Arrived
+                                </button>
+                                <button name="action_done" type="object" class="btn btn-sm btn-primary" invisible="state != 'arrived'">
+                                    Done
+                                </button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="view_restaurant_reservation_calendar" model="ir.ui.view">
+        <field name="name">restaurant.reservation.calendar</field>
+        <field name="model">restaurant.reservation</field>
+        <field name="arch" type="xml">
+            <calendar string="Reservations" date_start="reservation_date" color="state" mode="week">
+                <field name="customer_id"/>
+                <field name="table_id"/>
+                <field name="guest_count"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_restaurant_reservation_search" model="ir.ui.view">
+        <field name="name">restaurant.reservation.search</field>
+        <field name="model">restaurant.reservation</field>
+        <field name="arch" type="xml">
+            <search string="Search Reservations">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="table_id"/>
+                <filter string="Today's Bookings" name="today" domain="[('reservation_date', '=', context_today())]"/>
+                <filter string="Pending" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Arrived" name="arrived" domain="[('state', '=', 'arrived')]"/>
+                <group>
+                    <filter string="Customer" name="group_by_customer" domain="[]" context="{'group_by': 'customer_id'}"/>
+                    <filter string="Table" name="group_by_table" domain="[]" context="{'group_by': 'table_id'}"/>
+                    <filter string="Date" name="group_by_date" domain="[]" context="{'group_by': 'reservation_date'}"/>
+                    <filter string="Status" name="group_by_state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_restaurant_reservation" model="ir.actions.act_window">
+        <field name="name">Reservations</field>
+        <field name="res_model">restaurant.reservation</field>
+        <field name="view_mode">list,kanban,form,calendar</field>
+        <field name="search_view_id" ref="view_restaurant_reservation_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reservations found!
+            </p>
+            <p>
+                Manage customer table bookings and reservation schedules here.
+            </p>
+        </field>
+    </record>
+</odoo>

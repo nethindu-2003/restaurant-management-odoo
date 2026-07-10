@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu -->
+    <menuitem id="menu_restaurant_root" name="Restaurant" web_icon="restaurant_management,static/description/icon.png" sequence="10"/>
+
+    <!-- Dashboard -->
+    <menuitem id="menu_restaurant_dashboard" name="Dashboard" parent="menu_restaurant_root" action="action_restaurant_dashboard" sequence="10"/>
+
+    <!-- Reservations -->
+    <menuitem id="menu_restaurant_reservation" name="Reservations" parent="menu_restaurant_root" action="action_restaurant_reservation" sequence="20"/>
+
+    <!-- Kitchen Queue -->
+    <menuitem id="menu_restaurant_kitchen" name="Kitchen Queue" parent="menu_restaurant_root" action="action_kitchen_order_queue" sequence="30"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_restaurant_config" name="Configuration" parent="menu_restaurant_root" sequence="40"/>
+    <menuitem id="menu_restaurant_floors" name="Floors &amp; Tables" parent="menu_restaurant_config" action="pos_restaurant.action_restaurant_floor_form" sequence="10"/>
+</odoo>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Kitchen Orders Kanban View -->
+    <record id="view_pos_order_kanban_kitchen" model="ir.ui.view">
+        <field name="name">pos.order.kanban.kitchen</field>
+        <field name="model">pos.order</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="kitchen_state" create="false" delete="false" edit="false" disable_drag_drop_record="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="table_id"/>
+                <field name="date_order"/>
+                <field name="kitchen_state"/>
+                <field name="kitchen_order_details"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h4 class="m-0 text-primary" style="font-size: 1.1rem; font-weight: 700;">
+                                    <field name="name"/>
+                                </h4>
+                                <span class="badge text-bg-warning" invisible="not table_id">
+                                    Table: <field name="table_id"/>
+                                </span>
+                            </div>
+                            <div class="mb-2" style="font-size: 0.82rem; color: #a0a0c0;">
+                                <strong>Order Time:</strong> <field name="date_order" widget="datetime"/>
+                            </div>
+                            <!-- Render the beautiful HTML order details -->
+                            <div class="mb-3 mt-2 p-2" style="background: rgba(255,255,255,0.04); border-radius: 8px; border-left: 3px solid #e2b04a;">
+                                <field name="kitchen_order_details" widget="html"/>
+                            </div>
+                            <!-- Action buttons inside card to change states -->
+                            <div class="mt-3 d-flex gap-2">
+                                <button name="action_kitchen_prepare" type="object" class="btn btn-sm btn-outline-primary" invisible="kitchen_state != 'to_prepare'">
+                                    Start Preparing
+                                </button>
+                                <button name="action_kitchen_ready" type="object" class="btn btn-sm btn-outline-success" invisible="kitchen_state != 'preparing'">
+                                    Mark Prepared
+                                </button>
+                                <button name="action_kitchen_serve" type="object" class="btn btn-sm btn-outline-secondary" invisible="kitchen_state != 'prepared'">
+                                    Served
+                                </button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Kitchen List View -->
+    <record id="view_pos_order_tree_kitchen" model="ir.ui.view">
+        <field name="name">pos.order.list.kitchen</field>
+        <field name="model">pos.order</field>
+        <field name="arch" type="xml">
+            <list string="Kitchen Queue" create="false" delete="false" edit="false" decoration-danger="kitchen_state == 'to_prepare'" decoration-warning="kitchen_state == 'preparing'" decoration-success="kitchen_state == 'prepared'">
+                <field name="name"/>
+                <field name="table_id"/>
+                <field name="date_order"/>
+                <field name="kitchen_order_details" widget="html" string="Items"/>
+                <field name="kitchen_state" widget="badge" decoration-danger="kitchen_state == 'to_prepare'" decoration-warning="kitchen_state == 'preparing'" decoration-success="kitchen_state == 'prepared'"/>
+                <button name="action_kitchen_prepare" string="Prepare" type="object" class="oe_highlight" invisible="kitchen_state != 'to_prepare'"/>
+                <button name="action_kitchen_ready" string="Prepared" type="object" class="oe_highlight" invisible="kitchen_state != 'preparing'"/>
+                <button name="action_kitchen_serve" string="Served" type="object" class="oe_highlight" invisible="kitchen_state != 'prepared'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kitchen Orders Search View -->
+    <record id="view_pos_order_search_kitchen" model="ir.ui.view">
+        <field name="name">pos.order.search.kitchen</field>
+        <field name="model">pos.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Kitchen Queue">
+                <field name="name"/>
+                <field name="table_id"/>
+                <filter string="To Prepare" name="to_prepare" domain="[('kitchen_state', '=', 'to_prepare')]"/>
+                <filter string="Preparing" name="preparing" domain="[('kitchen_state', '=', 'preparing')]"/>
+                <filter string="Prepared" name="prepared" domain="[('kitchen_state', '=', 'prepared')]"/>
+                <filter string="Served Today" name="served_today" domain="[('kitchen_state', '=', 'served'), ('date_order', '&gt;=', context_today())]"/>
+                <group>
+                    <filter string="Table" name="group_by_table" domain="[]" context="{'group_by': 'table_id'}"/>
+                    <filter string="Kitchen Status" name="group_by_kitchen_state" domain="[]" context="{'group_by': 'kitchen_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_kitchen_order_queue" model="ir.actions.act_window">
+        <field name="name">Kitchen Order Queue</field>
+        <field name="res_model">pos.order</field>
+        <field name="view_mode">kanban,list</field>
+        <field name="search_view_id" ref="view_pos_order_search_kitchen"/>
+        <field name="domain">[('state', 'not in', ['draft', 'cancel']), '|', ('kitchen_state', '!=', 'served'), ('date_order', '&gt;=', context_today())]</field>
+        <field name="context">{'search_default_to_prepare': 1, 'search_default_preparing': 1, 'search_default_prepared': 1, 'search_default_served_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Kitchen queue is empty!
+            </p>
+            <p>
+                Incoming POS orders will appear here for preparation.
+            </p>
+        </field>
+    </record>
+
+    <!-- Force Action to use Kitchen Kanban View -->
+    <record id="action_kitchen_order_queue_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_pos_order_kanban_kitchen"/>
+        <field name="act_window_id" ref="action_kitchen_order_queue"/>
+    </record>
+
+    <!-- Force Action to use Kitchen List/Tree View -->
+    <record id="action_kitchen_order_queue_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_pos_order_tree_kitchen"/>
+        <field name="act_window_id" ref="action_kitchen_order_queue"/>
+    </record>
+</odoo>

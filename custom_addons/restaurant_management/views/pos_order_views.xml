@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pos_pos_form_inherit_reservation" model="ir.ui.view">
+        <field name="name">pos.order.form.inherit.reservation</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="reservation_id" invisible="not reservation_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_mrp_production_form_inherit_pos" model="ir.ui.view">
+        <field name="name">mrp.production.form.inherit.pos</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_extra_info']" position="inside">
+                <field name="pos_order_id" readonly="1" invisible="not pos_order_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

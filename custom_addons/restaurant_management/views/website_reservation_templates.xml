@@ -1,0 +1,1057 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========================================================
+         Website Nav: "Book a Table" button in website header
+         Uses Odoo's official header CTA placeholder mechanism
+         ======================================================== -->
+    <template id="res_website_book_table_nav"
+              inherit_id="website.placeholder_header_call_to_action"
+              name="Book a Table Nav Button">
+        <xpath expr="." position="inside">
+            <li>
+                <a href="/reservation"
+                   class="btn btn-warning fw-bold ms-2"
+                   style="border-radius:20px; padding:7px 18px; font-size:0.9rem;">
+                    <i class="fa fa-cutlery me-1"/>Book a Table
+                </a>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- ========================================================
+         Main Reservation Booking Page
+         ======================================================== -->
+    <template id="reservation_booking_page" name="Table Reservation">
+        <t t-call="website.layout">
+            <t t-set="head">
+                <style>
+                    /* ---- Global Page ---- */
+                    body { background: #0f0f1a; }
+                    #reservation-hero {
+                        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+                        padding: 60px 0 40px;
+                        color: #fff;
+                    }
+                    #reservation-hero h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; }
+                    #reservation-hero p { color: rgba(255,255,255,0.65); font-size: 1.1rem; }
+
+                    /* ---- Step Card ---- */
+                    .res-card {
+                        background: #1c1c2e;
+                        border: 1px solid rgba(255,255,255,0.07);
+                        border-radius: 16px;
+                        padding: 32px;
+                        color: #e0e0e0;
+                        margin-bottom: 24px;
+                    }
+                    .res-card h4 {
+                        color: #e2b04a;
+                        font-weight: 700;
+                        margin-bottom: 20px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                    .res-card h4 .step-badge {
+                        background: #e2b04a;
+                        color: #0f0f1a;
+                        border-radius: 50%;
+                        width: 30px; height: 30px;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 0.85rem;
+                        font-weight: 800;
+                        flex-shrink: 0;
+                    }
+
+                    /* ---- Form Controls ---- */
+                    .res-card .form-label { color: #a0a0b0; font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+                    .res-card .form-control,
+                    .res-card .form-select {
+                        background: #12121f;
+                        border: 1px solid rgba(255,255,255,0.12);
+                        color: #fff;
+                        border-radius: 10px;
+                        padding: 12px 14px;
+                        transition: border-color 0.2s;
+                    }
+                    .res-card .form-control:focus,
+                    .res-card .form-select:focus {
+                        background: #12121f;
+                        border-color: #e2b04a;
+                        color: #fff;
+                        box-shadow: 0 0 0 3px rgba(226,176,74,0.18);
+                    }
+                    .res-card .form-control::placeholder { color: rgba(255,255,255,0.3); }
+                    .res-card .form-select option { background: #1c1c2e; color: #fff; }
+
+                    /* ---- Search Button ---- */
+                    .btn-find-tables {
+                        background: linear-gradient(135deg, #e2b04a, #c97d20);
+                        color: #0f0f1a;
+                        border: none;
+                        border-radius: 12px;
+                        padding: 12px 32px;
+                        font-weight: 700;
+                        font-size: 1rem;
+                        letter-spacing: 0.3px;
+                        transition: transform 0.15s, box-shadow 0.15s;
+                    }
+                    .btn-find-tables:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(226,176,74,0.35); color: #0f0f1a; }
+
+                    /* ---- Floor Plan ---- */
+                    .floor-plan-container {
+                        background: #12121f;
+                        border-radius: 16px;
+                        padding: 24px;
+                        border: 1px solid rgba(255,255,255,0.07);
+                    }
+                    .floor-section-label {
+                        font-size: 0.75rem;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        color: #6060a0;
+                        margin-bottom: 12px;
+                        padding-left: 4px;
+                        border-left: 3px solid #e2b04a;
+                        padding-left: 10px;
+                    }
+
+                    /* ---- Table Card Visual ---- */
+                    .table-visual-wrap { padding: 8px; }
+                     .table-checkbox-input { display: none; }
+                     .table-visual-card {
+                         cursor: pointer;
+                         border-radius: 14px;
+                         border: 2px solid rgba(255,255,255,0.1);
+                         background: #1c1c2e;
+                         padding: 18px 12px;
+                         text-align: center;
+                         transition: all 0.2s ease;
+                         display: flex;
+                         flex-direction: column;
+                         align-items: center;
+                         gap: 8px;
+                         position: relative;
+                         overflow: hidden;
+                     }
+                     .table-visual-card:hover {
+                         border-color: #e2b04a;
+                         transform: translateY(-3px);
+                         box-shadow: 0 8px 24px rgba(226,176,74,0.2);
+                     }
+                     .table-checkbox-input:checked + .table-visual-card {
+                         border-color: #e2b04a;
+                         background: rgba(226,176,74,0.1);
+                         box-shadow: 0 0 0 3px rgba(226,176,74,0.25), 0 8px 24px rgba(226,176,74,0.2);
+                     }
+                     .table-checkbox-input:checked + .table-visual-card .table-icon { background: #e2b04a; color: #0f0f1a; }
+                     .table-icon {
+                         width: 56px; height: 56px;
+                         border-radius: 50%;
+                         background: rgba(255,255,255,0.07);
+                         display: flex;
+                         align-items: center;
+                         justify-content: center;
+                         font-size: 1.4rem;
+                         transition: background 0.2s, color 0.2s;
+                         color: #a0a0c0;
+                     }
+                     .table-name { font-weight: 700; color: #fff; font-size: 0.95rem; }
+                     .table-seats { font-size: 0.78rem; color: #7070a0; }
+                     .table-floor { font-size: 0.72rem; color: #505080; margin-top: 2px; }
+                     .table-selected-badge {
+                         position: absolute;
+                         top: 8px; right: 8px;
+                         width: 18px; height: 18px;
+                         background: #e2b04a;
+                         border-radius: 50%;
+                         display: none;
+                         align-items: center;
+                         justify-content: center;
+                         font-size: 0.6rem;
+                         color: #0f0f1a;
+                         font-weight: 800;
+                     }
+                     .table-checkbox-input:checked + .table-visual-card .table-selected-badge { display: flex; }
+
+                    /* ---- Contact Form ---- */
+                    .btn-confirm-reservation {
+                        background: linear-gradient(135deg, #22c55e, #16a34a);
+                        color: #fff;
+                        border: none;
+                        border-radius: 12px;
+                        padding: 14px 48px;
+                        font-weight: 700;
+                        font-size: 1.05rem;
+                        transition: transform 0.15s, box-shadow 0.15s;
+                    }
+                    .btn-confirm-reservation:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.3); color: #fff; }
+
+                    /* ---- Alerts ---- */
+                    .alert-res-danger { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; border-radius: 12px; padding: 14px 20px; }
+                    .alert-res-warning { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.25); color: #fde68a; border-radius: 12px; padding: 14px 20px; }
+                    .alert-res-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25); color: #93c5fd; border-radius: 12px; padding: 14px 20px; }
+
+                    /* ---- Validation Error ---- */
+                    .field-error { font-size: 0.8rem; color: #f87171; margin-top: 4px; display: none; }
+                    .field-error.show { display: block; }
+
+                    /* ---- No Tables ---- */
+                    .no-tables-state { text-align: center; padding: 40px; }
+                    .no-tables-state .no-tables-icon { font-size: 3rem; color: #303060; margin-bottom: 16px; }
+                    .no-tables-state p { color: #6060a0; }
+                </style>
+            </t>
+
+            <div id="wrap">
+                <!-- Hero Banner -->
+                <div id="reservation-hero">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8">
+                                <h1><i class="fa fa-cutlery me-3" style="color:#e2b04a;"/>Reserve Your Table</h1>
+                                <p class="mb-0">Pick your date, time, and party size — then choose your preferred table from our live floor plan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container py-5">
+
+                    <!-- Error banner -->
+                    <t t-if="error_msg">
+                        <div class="alert-res-danger mb-4">
+                            <i class="fa fa-exclamation-circle me-2"/><t t-out="error_msg"/>
+                        </div>
+                    </t>
+                    <t t-if="past_time_error">
+                        <div class="alert-res-danger mb-4">
+                            <i class="fa fa-clock-o me-2"/><strong>Invalid date/time.</strong> You cannot make a reservation for a past date or time. Please select a future slot.
+                        </div>
+                    </t>
+
+                    <!-- ========================
+                         STEP 1: Search Form
+                         ======================== -->
+                    <div class="res-card">
+                        <h4>
+                            <span class="step-badge">1</span>
+                            Check Availability
+                        </h4>
+                        <form id="searchForm" action="/reservation" method="get">
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-3">
+                                    <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
+                                    <input type="date" id="date" name="date" class="form-control"
+                                           t-att-value="date" required="1"/>
+                                    <div class="field-error" id="date-error">Please select a future date.</div>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label for="start_time" class="form-label">Start Time</label>
+                                    <select id="start_time" name="start_time" class="form-select">
+                                        <t t-foreach="time_options" t-as="t_opt">
+                                            <option t-att-value="t_opt[0]" t-att-selected="t_opt[0] == start_time">
+                                                <t t-out="t_opt[1]"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                    <div class="field-error" id="time-error">This time slot is in the past. Please choose a later time.</div>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label for="duration" class="form-label">Duration</label>
+                                    <select id="duration" name="duration" class="form-select">
+                                        <t t-foreach="duration_options" t-as="d_opt">
+                                            <option t-att-value="d_opt[0]" t-att-selected="d_opt[0] == duration">
+                                                <t t-out="d_opt[1]"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label for="guest_count" class="form-label">Guests <span class="text-danger">*</span></label>
+                                    <input type="number" id="guest_count" name="guest_count"
+                                           class="form-control" t-att-value="guest_count"
+                                           min="1" max="20" required="1"/>
+                                </div>
+                            </div>
+                            <div class="text-end mt-4">
+                                <button type="submit" id="findTablesBtn" class="btn-find-tables">
+                                    <i class="fa fa-search me-2"/>Find Available Tables
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ========================
+                         STEP 2: Visual Floor Plan
+                         ======================== -->
+                    <t t-if="searched">
+                        <form id="bookingForm" action="/reservation/book" method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="date" t-att-value="date"/>
+                            <input type="hidden" name="start_time" t-att-value="start_time"/>
+                            <input type="hidden" name="duration" t-att-value="duration"/>
+                            <input type="hidden" name="guest_count" t-att-value="guest_count"/>
+
+                            <div class="res-card">
+                                <h4 class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <span><span class="step-badge">2</span> Select Your Table(s)</span>
+                                    <span id="capacity-badge" class="badge bg-danger" style="font-size: 0.85rem; padding: 6px 14px; border-radius: 12px;">
+                                        Selected seats: 0 / <t t-out="guest_count"/> guests
+                                    </span>
+                                </h4>
+
+                                <t t-if="not tables">
+                                    <div class="no-tables-state">
+                                        <div class="no-tables-icon"><i class="fa fa-calendar-times-o"/></div>
+                                        <p class="mb-2">No available tables for your selected criteria.</p>
+                                        <p class="small">Try a different date, time, or reduce the number of guests.</p>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <!-- Group tables by floor -->
+                                    <div class="floor-plan-container">
+                                        <t t-set="current_floor" t-value="None"/>
+                                        <t t-foreach="tables" t-as="tbl">
+                                            <!-- Floor label when floor changes -->
+                                            <t t-if="tbl.floor_id.name != current_floor">
+                                                <t t-set="current_floor" t-value="tbl.floor_id.name"/>
+                                                <div class="floor-section-label mt-3 mb-2">
+                                                    <i class="fa fa-map-marker me-1"/>
+                                                    <t t-out="tbl.floor_id.name or 'Main Floor'"/>
+                                                </div>
+                                            </t>
+                                        </t>
+
+                                        <!-- Render all tables as visual cards -->
+                                        <div class="row g-2">
+                                            <t t-foreach="tables" t-as="tbl">
+                                                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                                                    <div class="table-visual-wrap">
+                                                        <input type="checkbox"
+                                                               name="table_ids"
+                                                               t-att-id="'tbl_' + str(tbl.id)"
+                                                               t-att-value="tbl.id"
+                                                               t-att-data-seats="tbl.seats"
+                                                               class="table-checkbox-input"
+                                                               style="display:none;"/>
+                                                        <label class="table-visual-card" t-att-for="'tbl_' + str(tbl.id)">
+                                                            <div class="table-selected-badge">✓</div>
+                                                            <div class="table-icon">
+                                                                <!-- Icon based on seat count -->
+                                                                <t t-if="tbl.seats &lt;= 2">🪑</t>
+                                                                <t t-elif="tbl.seats &lt;= 4">🍽️</t>
+                                                                <t t-else="">🏛️</t>
+                                                            </div>
+                                                            <div class="table-name">Table <t t-out="tbl.table_number"/></div>
+                                                            <div class="table-seats"><i class="fa fa-users me-1"/><t t-out="tbl.seats"/> seats</div>
+                                                            <div class="table-floor"><t t-out="tbl.floor_id.name or 'Main Floor'"/></div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+
+                                    <!-- Legend -->
+                                    <div class="d-flex gap-3 mt-3 flex-wrap">
+                                        <span style="font-size:0.78rem; color:#6060a0;"><i class="fa fa-circle me-1" style="color:#e2b04a;"/>Selected</span>
+                                        <span style="font-size:0.78rem; color:#6060a0;"><span style="color:#22c55e;">🪑</span> 1–2 seats</span>
+                                        <span style="font-size:0.78rem; color:#6060a0;"><span>🍽️</span> 3–4 seats</span>
+                                        <span style="font-size:0.78rem; color:#6060a0;"><span>🏛️</span> 5+ seats</span>
+                                    </div>
+
+                                    <div class="alert-res-danger mt-3" id="table-selection-error" style="display:none; font-size:0.9rem;">
+                                        Please select enough tables to accommodate <t t-out="guest_count"/> guests.
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- ========================
+                                 STEP 3: Contact Details
+                                 ======================== -->
+                            <t t-if="tables">
+                                <div class="res-card">
+                                    <h4>
+                                        <span class="step-badge">3</span>
+                                        Your Contact Details
+                                    </h4>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="customer_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                            <input type="text" id="customer_name" name="customer_name"
+                                                   class="form-control" placeholder="John Smith" required="1"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="customer_email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                            <input type="email" id="customer_email" name="customer_email"
+                                                   class="form-control" placeholder="john@example.com" required="1"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="customer_phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                            <input type="tel" id="customer_phone" name="customer_phone"
+                                                   class="form-control" placeholder="+1 555 000 0000" required="1"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="notes" class="form-label">Special Requests</label>
+                                            <input type="text" id="notes" name="notes"
+                                                   class="form-control" placeholder="e.g. window seat, birthday, dietary needs"/>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-4">
+                                        <button type="submit" class="btn-confirm-reservation">
+                                            <i class="fa fa-check-circle me-2"/>Confirm Reservation
+                                        </button>
+                                    </div>
+                                </div>
+                            </t>
+                        </form>
+                    </t>
+
+                </div><!-- /container -->
+            </div><!-- /wrap -->
+
+            <!-- ========================
+                 CLIENT-SIDE TIME VALIDATION
+                 ======================== -->
+            <script type="text/javascript">
+                (function () {
+                    'use strict';
+
+                    var todayStr = new Date().toISOString().split('T')[0];
+                    var dateInput  = document.getElementById('date');
+                    var timeSelect = document.getElementById('start_time');
+                    var findBtn    = document.getElementById('findTablesBtn');
+                    var searchForm = document.getElementById('searchForm');
+
+                    // Set minimum date to today
+                    if (dateInput) {
+                        dateInput.setAttribute('min', todayStr);
+                    }
+
+                    function isPastDateTime() {
+                        if (!dateInput || !timeSelect) return false;
+                        var selectedDate = dateInput.value;
+                        var selectedHour = parseFloat(timeSelect.value);
+                        if (!selectedDate) return false;
+
+                        var now = new Date();
+                        var nowDate = now.toISOString().split('T')[0];
+                        var nowHour = now.getHours() + now.getMinutes() / 60;
+
+                        if (selectedDate &lt; nowDate) return true;  // Past date
+                        if (selectedDate === nowDate &amp;&amp; selectedHour &lt;= nowHour) return true;  // Same day, past time
+                        return false;
+                    }
+
+                    function validateAndSubmit(e) {
+                        var dateErr = document.getElementById('date-error');
+                        var timeErr = document.getElementById('time-error');
+                        var valid = true;
+
+                        // Hide previous errors
+                        dateErr.classList.remove('show');
+                        timeErr.classList.remove('show');
+
+                        if (isPastDateTime()) {
+                            var selectedDate = dateInput ? dateInput.value : '';
+                            var nowDate = new Date().toISOString().split('T')[0];
+                            if (selectedDate &lt; nowDate) {
+                                dateErr.classList.add('show');
+                            } else {
+                                timeErr.classList.add('show');
+                            }
+                            e.preventDefault();
+                            valid = false;
+                        }
+                        return valid;
+                    }
+
+                    if (searchForm) {
+                        searchForm.addEventListener('submit', validateAndSubmit);
+                    }
+
+                    // Re-validate when date or time changes
+                    if (dateInput) {
+                        dateInput.addEventListener('change', function () {
+                            document.getElementById('date-error').classList.remove('show');
+                            document.getElementById('time-error').classList.remove('show');
+                        });
+                    }
+                    if (timeSelect) {
+                        timeSelect.addEventListener('change', function () {
+                            document.getElementById('time-error').classList.remove('show');
+                        });
+                    }
+
+                    // --- Multi-table selection capacity counter and validation ---
+                    var checkboxes = document.querySelectorAll('.table-checkbox-input');
+                    var capacityBadge = document.getElementById('capacity-badge');
+                    var errorDiv = document.getElementById('table-selection-error');
+                    var bookingForm = document.getElementById('bookingForm');
+                    var guestCountInput = document.getElementById('guest_count');
+
+                    function updateCapacity() {
+                        var totalSeats = 0;
+                        var checkedCount = 0;
+                        var guestCount = parseInt(guestCountInput ? guestCountInput.value : 0) || 2;
+
+                        checkboxes.forEach(function(cb) {
+                            if (cb.checked) {
+                                totalSeats += parseInt(cb.getAttribute('data-seats')) || 0;
+                                checkedCount++;
+                            }
+                        });
+
+                        if (capacityBadge) {
+                            capacityBadge.textContent = 'Selected seats: ' + totalSeats + ' / ' + guestCount + ' guests';
+                            if (totalSeats >= guestCount &amp;&amp; checkedCount > 0) {
+                                capacityBadge.className = 'badge bg-success';
+                            } else {
+                                capacityBadge.className = 'badge bg-danger';
+                            }
+                        }
+                    }
+
+                    checkboxes.forEach(function(cb) {
+                        cb.addEventListener('change', updateCapacity);
+                    });
+
+                    if (bookingForm) {
+                        bookingForm.addEventListener('submit', function(e) {
+                            var totalSeats = 0;
+                            var checkedCount = 0;
+                            var guestCount = parseInt(guestCountInput ? guestCountInput.value : 0) || 2;
+
+                            checkboxes.forEach(function(cb) {
+                                if (cb.checked) {
+                                    totalSeats += parseInt(cb.getAttribute('data-seats')) || 0;
+                                    checkedCount++;
+                                }
+                            });
+
+                            if (checkedCount === 0) {
+                                if (errorDiv) {
+                                    errorDiv.textContent = 'Please select at least one table.';
+                                    errorDiv.style.display = 'block';
+                                    errorDiv.scrollIntoView({ behavior: 'smooth' });
+                                }
+                                e.preventDefault();
+                                return false;
+                            }
+
+                            if (totalSeats &lt; guestCount) {
+                                if (errorDiv) {
+                                    errorDiv.textContent = 'The selected table(s) only seat ' + totalSeats + ' guests. You need at least ' + guestCount + ' seats. Please select additional tables.';
+                                    errorDiv.style.display = 'block';
+                                    errorDiv.scrollIntoView({ behavior: 'smooth' });
+                                }
+                                e.preventDefault();
+                                return false;
+                            }
+
+                            if (errorDiv) {
+                                errorDiv.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    // Run once on load to initialize badge state
+                    updateCapacity();
+                })();
+            </script>
+        </t>
+    </template>
+
+    <!-- ========================================================
+         Reservation Success Page
+         ======================================================== -->
+    <template id="reservation_success_page" name="Reservation Confirmed">
+        <t t-call="website.layout">
+            <t t-set="head">
+                <style>
+                    body { background: #0f0f1a; }
+                    .success-card {
+                        background: #1c1c2e;
+                        border: 1px solid rgba(255,255,255,0.07);
+                        border-radius: 20px;
+                        padding: 50px 40px;
+                        color: #e0e0e0;
+                        text-align: center;
+                    }
+                    .success-icon-wrap {
+                        width: 90px; height: 90px;
+                        background: linear-gradient(135deg, #22c55e, #16a34a);
+                        border-radius: 50%;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 2.5rem;
+                        color: #fff;
+                        margin-bottom: 24px;
+                        box-shadow: 0 0 40px rgba(34,197,94,0.3);
+                    }
+                    .success-card h1 { color: #fff; font-weight: 800; }
+                    .booking-info-box {
+                        background: rgba(255,255,255,0.04);
+                        border: 1px solid rgba(255,255,255,0.08);
+                        border-radius: 14px;
+                        padding: 24px;
+                        text-align: left;
+                        margin: 24px 0;
+                    }
+                    .booking-info-box .info-row {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 8px 0;
+                        border-bottom: 1px solid rgba(255,255,255,0.05);
+                    }
+                    .booking-info-box .info-row:last-child { border-bottom: none; }
+                    .booking-info-box .info-label { color: #7070a0; font-size: 0.85rem; font-weight: 600; }
+                    .booking-info-box .info-value { color: #e0e0e0; font-weight: 500; }
+                    .ref-badge {
+                        background: rgba(226,176,74,0.15);
+                        border: 1px solid rgba(226,176,74,0.3);
+                        color: #e2b04a;
+                        border-radius: 8px;
+                        padding: 2px 10px;
+                        font-family: monospace;
+                        font-weight: 700;
+                    }
+                    .btn-book-another {
+                        background: linear-gradient(135deg, #e2b04a, #c97d20);
+                        color: #0f0f1a;
+                        border: none;
+                        border-radius: 12px;
+                        padding: 12px 32px;
+                        font-weight: 700;
+                        text-decoration: none;
+                        display: inline-block;
+                        transition: transform 0.15s, box-shadow 0.15s;
+                    }
+                    .btn-book-another:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(226,176,74,0.35); color: #0f0f1a; }
+                </style>
+            </t>
+            <div id="wrap" style="background:#0f0f1a; min-height:100vh; padding:60px 0;">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6 col-md-8">
+                            <div class="success-card">
+                                <div class="success-icon-wrap">✓</div>
+                                <h1>Booking Confirmed!</h1>
+                                <p style="color:rgba(255,255,255,0.5); margin-bottom:0;">
+                                    Thank you! Your table is reserved. A confirmation email has been sent to you.
+                                </p>
+
+                                <div class="booking-info-box">
+                                     <div class="info-row">
+                                         <span class="info-label">Reservation Ref(s)</span>
+                                         <span class="info-value">
+                                             <t t-foreach="reservations" t-as="res">
+                                                 <span class="ref-badge"><t t-out="res.name"/></span>
+                                             </t>
+                                         </span>
+                                     </div>
+                                     <div class="info-row">
+                                         <span class="info-label">Guest Name</span>
+                                         <span class="info-value"><t t-out="reservation.customer_id.name"/></span>
+                                     </div>
+                                     <div class="info-row">
+                                         <span class="info-label">Table(s) Booked</span>
+                                         <span class="info-value" style="text-align: right;">
+                                             <t t-foreach="reservations" t-as="res">
+                                                 Table <t t-out="res.table_id.table_number"/> (<t t-out="res.table_id.floor_id.name or 'Main Floor'"/>)<br/>
+                                             </t>
+                                         </span>
+                                     </div>
+                                     <div class="info-row">
+                                         <span class="info-label">Date</span>
+                                         <span class="info-value"><t t-out="reservation.reservation_date"/></span>
+                                     </div>
+                                     <div class="info-row">
+                                         <span class="info-label">Time</span>
+                                         <span class="info-value"><t t-out="start_time_str"/> → <t t-out="end_time_str"/></span>
+                                     </div>
+                                     <div class="info-row">
+                                         <span class="info-label">Total Guests</span>
+                                         <span class="info-value">
+                                             <t t-out="sum(reservations.mapped('guest_count'))"/> people
+                                         </span>
+                                     </div>
+                                 </div>
+
+                                <a href="/reservation" class="btn-book-another">
+                                    <i class="fa fa-plus me-2"/>Make Another Reservation
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ========================================================
+         Website Nav: "Our Menu" link in website header
+         ======================================================== -->
+    <template id="res_website_menu_nav"
+              inherit_id="website.placeholder_header_call_to_action"
+              name="Our Menu Nav Button">
+        <xpath expr="." position="inside">
+            <li>
+                <a href="/products"
+                   class="btn btn-outline-light fw-bold ms-1"
+                   style="border-radius:20px; padding:7px 16px; font-size:0.9rem; border-color:rgba(255,255,255,0.4);">
+                    <i class="fa fa-list me-1"/>Our Menu
+                </a>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- ========================================================
+         Restaurant Products / Menu Page
+         ======================================================== -->
+    <template id="restaurant_products_page" name="Restaurant Menu">
+        <t t-call="website.layout">
+            <t t-set="head">
+                <style>
+                    body { background: #0f0f1a; }
+
+                    /* ---- Hero ---- */
+                    #menu-hero {
+                        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+                        padding: 56px 0 36px;
+                        color: #fff;
+                        border-bottom: 1px solid rgba(255,255,255,0.06);
+                    }
+                    #menu-hero h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; }
+                    #menu-hero p { color: rgba(255,255,255,0.55); font-size: 1.05rem; }
+
+                    /* ---- Search bar ---- */
+                    .menu-search-wrap { max-width: 480px; }
+                    .menu-search-wrap .input-group .form-control {
+                        background: rgba(255,255,255,0.07);
+                        border: 1px solid rgba(255,255,255,0.15);
+                        color: #fff;
+                        border-radius: 12px 0 0 12px;
+                        padding: 12px 18px;
+                    }
+                    .menu-search-wrap .input-group .form-control::placeholder { color: rgba(255,255,255,0.35); }
+                    .menu-search-wrap .input-group .form-control:focus {
+                        background: rgba(255,255,255,0.1);
+                        border-color: #e2b04a;
+                        box-shadow: none;
+                        color: #fff;
+                    }
+                    .menu-search-wrap .btn-search {
+                        background: #e2b04a;
+                        color: #0f0f1a;
+                        border: none;
+                        border-radius: 0 12px 12px 0;
+                        padding: 12px 20px;
+                        font-weight: 700;
+                    }
+                    .menu-search-wrap .btn-search:hover { background: #c97d20; }
+
+                    /* ---- Category Pills ---- */
+                    .categ-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+                    .categ-pill {
+                        padding: 7px 18px;
+                        border-radius: 24px;
+                        border: 1px solid rgba(255,255,255,0.15);
+                        background: rgba(255,255,255,0.05);
+                        color: #a0a0c0;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        text-decoration: none;
+                        transition: all 0.2s;
+                    }
+                    .categ-pill:hover { border-color: #e2b04a; color: #e2b04a; background: rgba(226,176,74,0.08); }
+                    .categ-pill.active { background: #e2b04a; color: #0f0f1a; border-color: #e2b04a; }
+
+                    /* ---- Section heading ---- */
+                    .menu-section-title {
+                        font-size: 1.2rem;
+                        font-weight: 800;
+                        color: #e2b04a;
+                        letter-spacing: 0.5px;
+                        text-transform: uppercase;
+                        margin: 36px 0 20px;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                    }
+                    .menu-section-title::after {
+                        content: '';
+                        flex: 1;
+                        height: 1px;
+                        background: rgba(226,176,74,0.2);
+                    }
+
+                    /* ---- Product Card ---- */
+                    .product-card {
+                        background: #1c1c2e;
+                        border: 1px solid rgba(255,255,255,0.06);
+                        border-radius: 16px;
+                        overflow: hidden;
+                        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .product-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+                        border-color: rgba(226,176,74,0.3);
+                    }
+                    .product-card-img {
+                        width: 100%;
+                        aspect-ratio: 4/3;
+                        object-fit: cover;
+                        background: #12121f;
+                    }
+                    .product-card-img-placeholder {
+                        width: 100%;
+                        aspect-ratio: 4/3;
+                        background: linear-gradient(135deg, #1a1a2e, #12121f);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 3rem;
+                        color: rgba(255,255,255,0.07);
+                    }
+                    .product-card-body {
+                        padding: 16px;
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .product-card-name {
+                        font-size: 1rem;
+                        font-weight: 700;
+                        color: #fff;
+                        margin-bottom: 6px;
+                        line-height: 1.3;
+                    }
+                    .product-card-desc {
+                        font-size: 0.8rem;
+                        color: #6060a0;
+                        margin-bottom: 12px;
+                        flex: 1;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                    }
+                    .product-card-footer {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        margin-top: auto;
+                    }
+                    .product-price {
+                        font-size: 1.1rem;
+                        font-weight: 800;
+                        color: #e2b04a;
+                    }
+                    .product-categ-badge {
+                        font-size: 0.7rem;
+                        background: rgba(226,176,74,0.1);
+                        color: #e2b04a;
+                        border: 1px solid rgba(226,176,74,0.2);
+                        border-radius: 8px;
+                        padding: 2px 8px;
+                        font-weight: 600;
+                    }
+
+                    /* ---- Empty state ---- */
+                    .menu-empty-state {
+                        text-align: center;
+                        padding: 80px 20px;
+                        color: #4040a0;
+                    }
+                    .menu-empty-state .empty-icon { font-size: 4rem; margin-bottom: 20px; }
+                    .menu-empty-state h3 { color: #6060a0; font-weight: 700; }
+
+                    /* ---- Reserve CTA ---- */
+                    .reserve-cta-bar {
+                        background: linear-gradient(135deg, rgba(226,176,74,0.12), rgba(201,125,32,0.08));
+                        border: 1px solid rgba(226,176,74,0.2);
+                        border-radius: 16px;
+                        padding: 32px;
+                        text-align: center;
+                        margin-top: 60px;
+                        margin-bottom: 40px;
+                    }
+                    .reserve-cta-bar h3 { color: #fff; font-weight: 800; }
+                    .reserve-cta-bar p { color: rgba(255,255,255,0.5); }
+                    .btn-reserve-cta {
+                        background: linear-gradient(135deg, #e2b04a, #c97d20);
+                        color: #0f0f1a;
+                        border: none;
+                        border-radius: 12px;
+                        padding: 12px 32px;
+                        font-weight: 700;
+                        font-size: 1rem;
+                        text-decoration: none;
+                        display: inline-block;
+                        transition: transform 0.15s, box-shadow 0.15s;
+                    }
+                    .btn-reserve-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(226,176,74,0.3); color: #0f0f1a; }
+                </style>
+            </t>
+
+            <div id="wrap">
+                <!-- Hero -->
+                <div id="menu-hero">
+                    <div class="container">
+                        <div class="row align-items-end">
+                            <div class="col-lg-7">
+                                <h1><i class="fa fa-utensils me-3" style="color:#e2b04a;"/>Our Menu</h1>
+                                <p class="mb-4">Explore our handcrafted dishes, fresh ingredients, and signature flavours.</p>
+                                <!-- Search -->
+                                <form action="/products" method="get" class="menu-search-wrap">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control"
+                                               placeholder="Search dishes..."
+                                               t-att-value="search"/>
+                                        <button type="submit" class="btn-search">
+                                            <i class="fa fa-search"/>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container py-4">
+
+                    <!-- Category filter pills -->
+                    <t t-if="all_categories">
+                        <div class="categ-pills">
+                            <a t-att-href="'/products' + ('?search=' + search if search else '')"
+                               t-att-class="'categ-pill' + (' active' if not active_categ else '')">
+                                <i class="fa fa-th me-1"/>All
+                            </a>
+                            <t t-foreach="all_categories" t-as="cat">
+                                <a t-attf-href="/products/category/#{cat.id}#{('?search=' + search) if search else ''}"
+                                   t-att-class="'categ-pill' + (' active' if active_categ and active_categ.id == cat.id else '')">
+                                    <t t-out="cat.name"/>
+                                </a>
+                            </t>
+                        </div>
+                    </t>
+
+                    <!-- Products grouped by category -->
+                    <t t-if="grouped_products or uncategorised_products">
+
+                        <t t-foreach="grouped_products.items()" t-as="categ_products">
+                            <t t-set="cat_key" t-value="categ_products[0]"/>
+                            <t t-set="cat_prods" t-value="categ_products[1]"/>
+
+                            <div class="menu-section-title">
+                                <t t-out="cat_key.name"/>
+                            </div>
+
+                            <div class="row g-3 mb-2">
+                                <t t-foreach="cat_prods" t-as="prod">
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="product-card">
+                                            <!-- Product Image -->
+                                            <t t-if="prod.image_128">
+                                                <img t-attf-src="/web/image/product.template/#{prod.id}/image_128"
+                                                     class="product-card-img"
+                                                     t-att-alt="prod.name"/>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="product-card-img-placeholder">🍽️</div>
+                                            </t>
+
+                                            <div class="product-card-body">
+                                                <div class="product-card-name"><t t-out="prod.name"/></div>
+                                                <div class="product-card-desc">
+                                                    <t t-if="prod.description_sale">
+                                                        <t t-out="prod.description_sale"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <t t-out="prod.description or ''"/>
+                                                    </t>
+                                                </div>
+                                                <div class="product-card-footer">
+                                                    <span class="product-price">
+                                                        $<t t-out="'%.2f' % prod.list_price"/>
+                                                    </span>
+                                                    <t t-if="prod.pos_categ_ids">
+                                                        <span class="product-categ-badge">
+                                                            <t t-out="prod.pos_categ_ids[0].name"/>
+                                                        </span>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+
+                        <!-- Uncategorised products -->
+                        <t t-if="uncategorised_products">
+                            <div class="menu-section-title">Other Items</div>
+                            <div class="row g-3 mb-2">
+                                <t t-foreach="uncategorised_products" t-as="prod">
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="product-card">
+                                            <t t-if="prod.image_128">
+                                                <img t-attf-src="/web/image/product.template/#{prod.id}/image_128"
+                                                     class="product-card-img"
+                                                     t-att-alt="prod.name"/>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="product-card-img-placeholder">🍽️</div>
+                                            </t>
+                                            <div class="product-card-body">
+                                                <div class="product-card-name"><t t-out="prod.name"/></div>
+                                                <div class="product-card-desc"><t t-out="prod.description_sale or prod.description or ''"/></div>
+                                                <div class="product-card-footer">
+                                                    <span class="product-price">$<t t-out="'%.2f' % prod.list_price"/></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+
+                    </t>
+                    <t t-else="">
+                        <!-- Empty state -->
+                        <div class="menu-empty-state">
+                            <div class="empty-icon">🍽️</div>
+                            <h3>No dishes found</h3>
+                            <p t-if="search">
+                                No results for "<strong><t t-out="search"/></strong>".
+                                <a href="/products" style="color:#e2b04a;">Clear search</a>
+                            </p>
+                            <p t-else="">Our menu is being updated. Check back soon!</p>
+                        </div>
+                    </t>
+
+                    <!-- Reserve a Table CTA -->
+                    <div class="reserve-cta-bar">
+                        <h3>Ready to dine with us?</h3>
+                        <p>Reserve your table now and enjoy the full experience.</p>
+                        <a href="/reservation" class="btn-reserve-cta">
+                            <i class="fa fa-cutlery me-2"/>Book a Table
+                        </a>
+                    </div>
+
+                </div><!-- /container -->
+            </div><!-- /wrap -->
+        </t>
+    </template>
+
+</odoo>
