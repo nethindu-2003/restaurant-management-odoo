@@ -68,10 +68,18 @@ jobs:
           PGUSER: odoo
           PGPASSWORD: odoo
         run: |
-          # Run tests for custom module
-          # We use --test-enable and --stop-after-init to run unit tests and stop
-          # -i specifies the module to install and test
-          uv run ./odoo/odoo-bin -c odoo.conf -d test_db -i restaurant_management --test-enable --stop-after-init --addons-path=odoo/addons,custom_addons
+          # Create temporary directories for CI test data
+          mkdir -p /tmp/odoo_data /tmp/odoo_screenshots
+          
+          # Run tests overriding data-dir and screenshots to avoid local path permission errors
+          uv run ./odoo/odoo-bin -c odoo.conf \
+            -d test_db \
+            -i restaurant_management \
+            --test-enable \
+            --stop-after-init \
+            --addons-path=odoo/addons,custom_addons \
+            --data-dir=/tmp/odoo_data \
+            --screenshots=/tmp/odoo_screenshots
           
           # Check logs for test failures (odoo exits with 0 even if tests fail sometimes)
           # A robust check would parse the logs, but we rely on standard exit code for now.
