@@ -1,0 +1,40 @@
+2026-07-02 10:42:43,298 86075 WARNING ? odoo.tools.config: missing --http-interface/http_interface, using 0.0.0.0 by default, will change to 127.0.0.1 in 20.0 
+2026-07-02 10:42:43,298 86075 WARNING ? odoo.tools.config: missing --http-interface/http_interface, using 0.0.0.0 by default, will change to 127.0.0.1 in 20.0 
+2026-07-02 10:42:43,299 86075 INFO ? odoo: Odoo version 19.0 
+2026-07-02 10:42:43,299 86075 INFO ? odoo: Odoo version 19.0 
+2026-07-02 10:42:43,299 86075 INFO ? odoo: Using configuration file at /Users/nethindu/Desktop/Odoo/odoo/odoo.conf 
+2026-07-02 10:42:43,299 86075 INFO ? odoo: Using configuration file at /Users/nethindu/Desktop/Odoo/odoo/odoo.conf 
+2026-07-02 10:42:43,299 86075 INFO ? odoo: addons paths: _NamespacePath(['/Users/nethindu/Desktop/Odoo/odoo/odoo/addons', '/Users/nethindu/Library/Application Support/Odoo/addons/19.0', '/Users/nethindu/Desktop/Odoo/odoo/addons', '/Users/nethindu/Desktop/Odoo/custom_addons']) 
+2026-07-02 10:42:43,299 86075 INFO ? odoo: addons paths: _NamespacePath(['/Users/nethindu/Desktop/Odoo/odoo/odoo/addons', '/Users/nethindu/Library/Application Support/Odoo/addons/19.0', '/Users/nethindu/Desktop/Odoo/odoo/addons', '/Users/nethindu/Desktop/Odoo/custom_addons']) 
+2026-07-02 10:42:43,299 86075 INFO ? odoo: database: odoo@localhost:5432 
+2026-07-02 10:42:43,299 86075 INFO ? odoo: database: odoo@localhost:5432 
+2026-07-02 10:42:43,544 86075 INFO odoo odoo.modules.loading: loading 1 modules... 
+2026-07-02 10:42:43,544 86075 INFO odoo odoo.modules.loading: loading 1 modules... 
+2026-07-02 10:42:43,546 86075 INFO odoo odoo.modules.loading: 1 modules loaded in 0.00s, 0 queries (+0 extra) 
+2026-07-02 10:42:43,546 86075 INFO odoo odoo.modules.loading: 1 modules loaded in 0.00s, 0 queries (+0 extra) 
+2026-07-02 10:42:43,558 86075 INFO odoo odoo.modules.loading: updating modules list 
+2026-07-02 10:42:43,558 86075 INFO odoo odoo.modules.loading: updating modules list 
+2026-07-02 10:42:43,559 86075 INFO odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-07-02 10:42:43,559 86075 INFO odoo odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-07-02 10:42:44,182 86075 WARNING odoo odoo.modules.module: Missing `author` key in manifest for 'restaurant_management', defaulting to '' 
+2026-07-02 10:42:44,182 86075 WARNING odoo odoo.modules.module: Missing `author` key in manifest for 'restaurant_management', defaulting to '' 
+2026-07-02 10:42:44,182 86075 WARNING odoo odoo.modules.module: Missing `author` key in manifest for 'restaurant_management', defaulting to '' 
+2026-07-02 10:42:44,182 86075 WARNING odoo odoo.modules.module: Missing `author` key in manifest for 'restaurant_management', defaulting to '' 
+2026-07-02 10:42:44,332 86075 INFO odoo odoo.modules.loading: loading 14 modules... 
+2026-07-02 10:42:44,332 86075 INFO odoo odoo.modules.loading: loading 14 modules... 
+2026-07-02 10:42:44,479 86075 INFO odoo odoo.modules.loading: 14 modules loaded in 0.15s, 0 queries (+0 extra) 
+2026-07-02 10:42:44,479 86075 INFO odoo odoo.modules.loading: 14 modules loaded in 0.15s, 0 queries (+0 extra) 
+2026-07-02 10:42:44,643 86075 INFO odoo odoo.modules.loading: Modules loaded. 
+2026-07-02 10:42:44,643 86075 INFO odoo odoo.modules.loading: Modules loaded. 
+2026-07-02 10:42:44,742 86075 INFO odoo odoo.registry: Registry changed, signaling through the database 
+2026-07-02 10:42:44,742 86075 INFO odoo odoo.registry: Registry changed, signaling through the database 
+2026-07-02 10:42:44,755 86075 INFO odoo odoo.registry: Registry loaded in 1.248s 
+2026-07-02 10:42:44,755 86075 INFO odoo odoo.registry: Registry loaded in 1.248s 
+2026-07-02 10:42:44,755 86075 INFO odoo odoo.service.server: Initiating shutdown 
+2026-07-02 10:42:44,755 86075 INFO odoo odoo.service.server: Initiating shutdown 
+2026-07-02 10:42:44,755 86075 INFO odoo odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-07-02 10:42:44,755 86075 INFO odoo odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-07-02 10:42:44,755 86075 INFO odoo odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  
+2026-07-02 10:42:44,755 86075 INFO odoo odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  
+2026-07-02 10:42:44,758 86075 INFO odoo odoo.service.server: A child process was found, pid is psutil.Process(pid=86076, name='zsh', status='running', started='10:42:43'), process may hang 
+2026-07-02 10:42:44,758 86075 INFO odoo odoo.service.server: A child process was found, pid is psutil.Process(pid=86076, name='zsh', status='running', started='10:42:43'), process may hang 
