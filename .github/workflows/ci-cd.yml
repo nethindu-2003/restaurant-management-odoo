@@ -23,7 +23,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U odoo"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -72,7 +72,11 @@ jobs:
           mkdir -p /tmp/odoo_data /tmp/odoo_screenshots
           
           # Run tests overriding data-dir and screenshots to avoid local path permission errors
+          # Explicitly provide DB connection parameters to prevent defaulting to OS user (root)
           uv run ./odoo/odoo-bin -c odoo.conf \
+            --db_host=localhost \
+            --db_user=odoo \
+            --db_password=odoo \
             -d test_db \
             -i restaurant_management \
             --test-enable \
