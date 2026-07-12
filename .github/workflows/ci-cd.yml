@@ -19,7 +19,9 @@ jobs:
         env:
           POSTGRES_USER: odoo
           POSTGRES_PASSWORD: odoo
-          POSTGRES_DB: postgres
+          # Create the 'odoo' database at startup so Odoo doesn't get
+          # FATAL: database "odoo" does not exist on first connection
+          POSTGRES_DB: odoo
         ports:
           - 5432:5432
         options: >-
@@ -68,10 +70,10 @@ jobs:
           PGUSER: odoo
           PGPASSWORD: odoo
         run: |
-          # Drop any leftover test_db from a previous run and create it fresh.
-          # This prevents duplicate key violations caused by stale data.
-          psql -h localhost -U odoo -d postgres -c "DROP DATABASE IF EXISTS test_db;"
-          psql -h localhost -U odoo -d postgres -c "CREATE DATABASE test_db OWNER odoo;"
+          # Drop and recreate test_db to guarantee a clean slate on every run.
+          # This prevents duplicate key violations from any leftover data.
+          psql -h localhost -U odoo -d odoo -c "DROP DATABASE IF EXISTS test_db;"
+          psql -h localhost -U odoo -d odoo -c "CREATE DATABASE test_db OWNER odoo;"
 
       - name: Run Odoo Tests
         env:
@@ -79,24 +81,18 @@ jobs:
           PGUSER: odoo
           PGPASSWORD: odoo
         run: |
-          # Create temporary directories for CI test data
+          # Create tmp directories required by odoo-ci.conf
           mkdir -p /tmp/odoo_data /tmp/odoo_screenshots
 
-          # Run tests on the freshly created test_db.
-          # --without-demo=all prevents demo data loading which can cause constraint collisions.
-          # Explicitly pass DB credentials to prevent Odoo defaulting to the OS user (root).
-          uv run ./odoo/odoo-bin -c odoo.conf \
-            --db_host=localhost \
-            --db_user=odoo \
-            --db_password=odoo \
-            -d test_db \
+          # Use odoo-ci.conf (not odoo.conf) which has all CI-correct settings:
+          # correct db_name, data_dir, without_demo=all, etc.
+          # This avoids FATAL: database "odoo" does not exist errors that were
+          # caused by odoo.conf pointing at the local macOS database setup.
+          uv run ./odoo/odoo-bin -c odoo-ci.conf \
             -i restaurant_management \
             --test-enable \
             --stop-after-init \
-            --without-demo=all \
-            --addons-path=odoo/addons,custom_addons \
-            --data-dir=/tmp/odoo_data \
-            --screenshots=/tmp/odoo_screenshots
+            --addons-path=odoo/addons,custom_addons
 
 
   deploy:
