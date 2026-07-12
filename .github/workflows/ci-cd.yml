@@ -49,9 +49,12 @@ jobs:
           echo "Running Ruff linter on custom_addons/..."
           # Use Odoo's own ruff config as the standard, with select/ignore overrides
           # E501 (line too long) and some style rules are ignored for Odoo compatibility
+          # F401 in __init__.py is intentional in Odoo — imports are side-effects
+          # that register models and controllers with the Odoo registry.
           ruff check custom_addons/ \
             --select=E,F,W \
             --ignore=E501,E302,E303,E266,W291,W293 \
+            --per-file-ignores="**/__init__.py:F401" \
             --output-format=github
           echo "✅ Ruff linting passed."
 

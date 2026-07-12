@@ -89,7 +89,7 @@ class RestaurantReservationPortal(http.Controller):
 
         if date_str and start_time_str and duration_str and guest_count_str:
             try:
-                guest_count = int(guest_count_str)
+                int(guest_count_str)  # validate guest count is an integer
                 start_time = float(start_time_str)
                 duration = float(duration_str)
                 end_time = start_time + duration
@@ -120,7 +120,7 @@ class RestaurantReservationPortal(http.Controller):
                         ('id', 'not in', reserved_table_ids)
                     ])
 
-            except Exception as e:
+            except Exception:
                 error_msg = _("Invalid search input. Please try again.")
 
         values = {
@@ -158,7 +158,7 @@ class RestaurantReservationPortal(http.Controller):
         else:
             try:
                 table_ids = [int(table_ids_raw)] if table_ids_raw else []
-            except:
+            except (TypeError, ValueError):
                 table_ids = []
 
         if not (name and email and phone and table_ids and date_str and start_time_str and duration_str and guest_count_str):
@@ -238,7 +238,7 @@ class RestaurantReservationPortal(http.Controller):
                 'end_time_str': next((opt[1] for opt in self._get_time_options() if opt[0] == end_time), f"{int(end_time):02d}:{int((end_time%1)*60):02d}"),
             })
 
-        except Exception as e:
+        except Exception:
             return request.redirect('/reservation?error=failed_creation')
 
 

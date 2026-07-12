@@ -228,7 +228,7 @@ class RestaurantReservation(models.Model):
 </div>
                     """
                 })
-        except Exception as e:
+        except Exception:
             pass
 
         for rec in self:
