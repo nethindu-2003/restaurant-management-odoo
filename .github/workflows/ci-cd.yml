@@ -34,7 +34,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Ruff (linter)
-        run: uv pip install ruff
+        run: uv pip install --system ruff
 
       # ── Python: syntax check ──────────────────────────────────────────────
       - name: Check Python syntax (compile check)
