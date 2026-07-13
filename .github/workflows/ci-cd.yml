@@ -124,11 +124,9 @@ jobs:
 
             # Update Python dependencies if uv.lock changed
             uv sync
-
-            # Update the Odoo module in the production database
-            # Replace 'your_production_db' with your actual database name!
+            
             uv run ./odoo/odoo-bin -c odoo.conf \
-              -d your_production_db \
+              -d restaurant_db \
               -u restaurant_management \
               --stop-after-init \
               --addons-path=odoo/addons,custom_addons
