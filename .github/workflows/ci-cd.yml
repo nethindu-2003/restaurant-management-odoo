@@ -116,16 +116,20 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
             # Navigate to the project directory on the Lightsail server.
-            # Update this path to match your actual deployment directory!
             cd /opt/odoo/restaurant-management-odoo
 
             # Pull latest changes
             git pull origin main
 
+            # Use the full path to uv because GitHub Actions SSHes with a
+            # non-interactive shell that does not load ~/.bashrc or PATH exports.
+            export UV=/home/ubuntu/.local/bin/uv
+
             # Update Python dependencies if uv.lock changed
-            uv sync
-            
-            uv run ./odoo/odoo-bin -c odoo.conf \
+            $UV sync
+
+            # Update the Odoo module in the production database
+            $UV run ./odoo/odoo-bin -c odoo.conf \
               -d restaurant_db \
               -u restaurant_management \
               --stop-after-init \
