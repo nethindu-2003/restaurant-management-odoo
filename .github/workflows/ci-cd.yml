@@ -125,8 +125,8 @@ jobs:
             # non-interactive shell that does not load ~/.bashrc or PATH exports.
             export UV=/home/ubuntu/.local/bin/uv
 
-            # Update Python dependencies if uv.lock changed
-            $UV sync
+            # Re-install Odoo's requirements directly into the venv.
+            $UV pip install -r odoo/requirements.txt
 
             # Update the Odoo module in the production database
             $UV run ./odoo/odoo-bin -c odoo.conf \
