@@ -93,13 +93,13 @@
                                 <span class="badge text-bg-secondary"><field name="guest_count"/> Guests</span>
                             </div>
                             <div class="mb-1 text-muted">
-                                <i class="fa fa-user me-1"/> <field name="customer_id"/>
+                                <i class="fa fa-user me-1" title="Customer"/> <field name="customer_id"/>
                             </div>
                             <div class="mb-1 text-muted">
-                                <i class="fa fa-table me-1"/> Table: <field name="table_id"/>
+                                <i class="fa fa-table me-1" title="Table"/> Table: <field name="table_id"/>
                             </div>
                             <div class="mb-1 text-muted">
-                                <i class="fa fa-calendar me-1"/> <field name="reservation_date"/> @ <field name="start_time" widget="float_time"/>
+                                <i class="fa fa-calendar me-1" title="Date"/> <field name="reservation_date"/> @ <field name="start_time" widget="float_time"/>
                             </div>
                             <div class="mt-2 pt-2 border-top d-flex justify-content-end gap-1" t-if="record.state.raw_value === 'confirmed' || record.state.raw_value === 'arrived'">
                                 <button name="action_arrive" type="object" class="btn btn-sm btn-success" invisible="state != 'confirmed'">

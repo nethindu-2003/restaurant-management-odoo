@@ -2,6 +2,7 @@
 {
     'name': 'Restaurant Management',
     'version': '19.0.1.0.0',
+    'author': 'Nethindu Chandula',
     'category': 'Sales/Point of Sale',
     'summary': 'Online Reservations, structured POS billing, KDS and Admin Dashboard',
     'description': """
