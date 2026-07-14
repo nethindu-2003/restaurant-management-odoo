@@ -203,6 +203,61 @@
                     .no-tables-state { text-align: center; padding: 40px; }
                     .no-tables-state .no-tables-icon { font-size: 3rem; color: #303060; margin-bottom: 16px; }
                     .no-tables-state p { color: #6060a0; }
+
+                    /* ---- Responsive Adjustments ---- */
+                    @media (max-width: 768px) {
+                        #reservation-hero {
+                            padding: 40px 0 24px;
+                            text-align: center;
+                        }
+                        #reservation-hero h1 {
+                            font-size: 1.8rem;
+                        }
+                        #reservation-hero p {
+                            font-size: 0.95rem;
+                        }
+                        .res-card {
+                            padding: 20px 16px;
+                            margin-bottom: 16px;
+                        }
+                        .res-card h4 {
+                            font-size: 1.15rem;
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 8px;
+                        }
+                        #capacity-badge {
+                            width: 100%;
+                            text-align: center;
+                            margin-top: 4px;
+                        }
+                        .btn-find-tables {
+                            width: 100%;
+                            padding: 12px 20px;
+                        }
+                        .floor-plan-container {
+                            padding: 12px;
+                        }
+                        .table-visual-card {
+                            padding: 12px 6px;
+                            gap: 4px;
+                        }
+                        .table-icon {
+                            width: 44px;
+                            height: 44px;
+                            font-size: 1.1rem;
+                        }
+                        .table-name {
+                            font-size: 0.85rem;
+                        }
+                        .table-seats {
+                            font-size: 0.72rem;
+                        }
+                        .btn-confirm-reservation {
+                            width: 100%;
+                            padding: 14px 20px;
+                        }
+                    }
                 </style>
             </t>
 
@@ -633,6 +688,38 @@
                         transition: transform 0.15s, box-shadow 0.15s;
                     }
                     .btn-book-another:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(226,176,74,0.35); color: #0f0f1a; }
+
+                    @media (max-width: 768px) {
+                        .success-card {
+                            padding: 30px 20px;
+                        }
+                        .success-icon-wrap {
+                            width: 70px;
+                            height: 70px;
+                            font-size: 2rem;
+                            margin-bottom: 16px;
+                        }
+                        .success-card h1 {
+                            font-size: 1.8rem;
+                        }
+                        .booking-info-box {
+                            padding: 16px;
+                            margin: 16px 0;
+                        }
+                        .booking-info-box .info-row {
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 4px;
+                            padding: 10px 0;
+                        }
+                        .booking-info-box .info-row .info-value {
+                            text-align: left !important;
+                        }
+                        .btn-book-another {
+                            width: 100%;
+                            padding: 12px 20px;
+                        }
+                    }
                 </style>
             </t>
             <div id="wrap" style="background:#0f0f1a; min-height:100vh; padding:60px 0;">
@@ -757,8 +844,20 @@
                     .menu-search-wrap .btn-search:hover { background: #c97d20; }
 
                     /* ---- Category Pills ---- */
-                    .categ-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+                    .categ-pills {
+                        display: flex;
+                        flex-wrap: nowrap;
+                        overflow-x: auto;
+                        -webkit-overflow-scrolling: touch;
+                        gap: 10px;
+                        margin-bottom: 32px;
+                        padding-bottom: 8px;
+                    }
+                    .categ-pills::-webkit-scrollbar {
+                        display: none;
+                    }
                     .categ-pill {
+                        flex: 0 0 auto;
                         padding: 7px 18px;
                         border-radius: 24px;
                         border: 1px solid rgba(255,255,255,0.15);
@@ -901,6 +1000,35 @@
                         transition: transform 0.15s, box-shadow 0.15s;
                     }
                     .btn-reserve-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(226,176,74,0.3); color: #0f0f1a; }
+
+                    @media (max-width: 768px) {
+                        #menu-hero {
+                            padding: 40px 0 24px;
+                            text-align: center;
+                        }
+                        #menu-hero h1 {
+                            font-size: 1.8rem;
+                        }
+                        #menu-hero p {
+                            font-size: 0.95rem;
+                        }
+                        .menu-search-wrap {
+                            max-width: 100%;
+                            margin: 0 auto;
+                        }
+                        .reserve-cta-bar {
+                            padding: 24px 16px;
+                            margin-top: 40px;
+                            margin-bottom: 20px;
+                        }
+                        .reserve-cta-bar h3 {
+                            font-size: 1.4rem;
+                        }
+                        .btn-reserve-cta {
+                            width: 100%;
+                            padding: 12px 20px;
+                        }
+                    }
                 </style>
             </t>
 

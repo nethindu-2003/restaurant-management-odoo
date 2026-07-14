@@ -23,4 +23,10 @@
         font-weight: 500;
         padding: 0.4em 0.8em;
     }
+
+    .dashboard-bottom-grid {
+        @media (max-width: 992px) {
+            grid-template-columns: 1fr !important;
+        }
+    }
 }

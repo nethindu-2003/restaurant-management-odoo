@@ -167,7 +167,7 @@
             </div>
 
             <!-- ======= BOTTOM ROW ======= -->
-            <div style="display:grid; grid-template-columns:1fr 340px; gap:20px; align-items:start;">
+            <div class="dashboard-bottom-grid" style="display:grid; grid-template-columns:1fr 340px; gap:20px; align-items:start;">
 
                 <!-- Recent Reservations Table -->
                 <div style="
